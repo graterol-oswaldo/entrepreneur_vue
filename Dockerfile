@@ -20,6 +20,8 @@ ARG uid=1000
                  
 WORKDIR /app
 
+RUN npm install -g npm@7.24.2
+
 #RUN npm run build 
 
 EXPOSE 80
