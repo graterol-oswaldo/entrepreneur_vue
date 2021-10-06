@@ -20,7 +20,7 @@ ARG uid=1000
                  
 WORKDIR /app
 
-RUN npm run build 
+#RUN npm run build 
 
 EXPOSE 80
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
