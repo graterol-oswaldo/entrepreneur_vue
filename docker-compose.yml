@@ -1,9 +1,9 @@
 version: "3"
 
 services:
-  client_service:
-    image: client_service
-    container_name: client_service
+  client_entrepreneur_service:
+    image: client_entrepreneur_service
+    container_name: client_entrepreneur_service
     build: .
     ports:
       - "80:80"
