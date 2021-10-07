@@ -2,7 +2,9 @@ import axios from "axios";
 import store from "@/store";
 
 export const authClient = axios.create({
-  baseURL: process.env.VUE_APP_API_URL,
+  //baseURL: process.env.VUE_APP_API_URL,
+  baseURL: "http://backend.entrepreneur.com",
+
   withCredentials: true, // required to handle the CSRF token
 });
 
@@ -13,7 +15,7 @@ authClient.interceptors.response.use(
   (response) => {
     return response;
   },
-  function (error) {
+  function(error) {
     if (
       error.response &&
       [401, 419].includes(error.response.status) &&
@@ -28,6 +30,9 @@ authClient.interceptors.response.use(
 
 export default {
   async login(payload) {
+    console.log("-------------------");
+    console.log(process.env.VUE_APP_API_URL);
+    console.log("-------------------");
     await authClient.get("/sanctum/csrf-cookie");
     return authClient.post("/login", payload);
   },
