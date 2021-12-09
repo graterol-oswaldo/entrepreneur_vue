@@ -1,4 +1,7 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, 
+//createWebHashHistory
+createWebHistory
+ } from 'vue-router'
 import store from "@/store/index";
 import auth from "@/middleware/auth";
 import admin from "@/middleware/admin";
@@ -15,6 +18,11 @@ const routes = [{
     name: "dashboard",
     meta: { middleware: [auth], layout: "default" },
     component: () => import(/* webpackChunkName: "Dashboard" */ "../views/Dashboard"),
+  }, {
+    path: "/products",
+    name: "Products",
+    meta: { middleware: [guest], layout: "default" },
+    component: () => import(/* webpackChunkName: "Shopcart" */ "../views/Shopcart/Tabs.vue"),
   }, {
     path: "/profile",
     name: "profile",
@@ -84,7 +92,9 @@ const routes = [{
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  //history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(),
+  //history: createWebHashHistory(),
   routes,
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {

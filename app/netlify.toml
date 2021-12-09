@@ -3,5 +3,6 @@
   command = "npm run build"
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to = "http://frontend.entrepreneur.com"
   status = 200
+  force = true # COMMENT: ensure that we always redirect
