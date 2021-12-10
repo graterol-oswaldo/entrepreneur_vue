@@ -1,7 +1,4 @@
-import { createRouter, 
-//createWebHashHistory
-createWebHistory
- } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import store from "@/store/index";
 import auth from "@/middleware/auth";
 import admin from "@/middleware/admin";
@@ -21,7 +18,7 @@ const routes = [{
   }, {
     path: "/products",
     name: "Products",
-    meta: { middleware: [guest], layout: "default" },
+    meta: { middleware: [auth], layout: "default" },
     component: () => import(/* webpackChunkName: "Shopcart" */ "../views/Shopcart/Tabs.vue"),
   }, {
     path: "/profile",
@@ -32,7 +29,25 @@ const routes = [{
     path: "/users",
     name: "users",
     meta: { middleware: [auth] },
-    component: () => import(/* webpackChunkName: "Users" */ "../views/Users"),
+    component: () => import(/* webpackChunkName: "Users" */ "../views/Users/Index"),
+  }, {
+    path: "/users/create",
+    name: "userCreate",
+    meta: { middleware: [auth] },
+    component: () => import(/* webpackChunkName: "userCreate" */ "../views/Users/Create"),
+    props: true
+  }, {
+    path: "/users/show/:id",
+    name: "userShow",
+    meta: { middleware: [auth] },
+    component: () => import(/* webpackChunkName: "userShow" */ "../views/Users/Show"),
+    props: true
+  }, {
+    path: "/users/edit/:id",
+    name: "userEdit",
+    meta: { middleware: [auth] },
+    component: () => import(/* webpackChunkName: "userEdit" */ "../views/Users/Edit"),
+    props: true    
   }, {
     path: "/login",
     name: "login",
@@ -92,9 +107,7 @@ const routes = [{
 ];
 
 const router = createRouter({
-  //history: createWebHistory(process.env.BASE_URL),
   history: createWebHistory(),
-  //history: createWebHashHistory(),
   routes,
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {

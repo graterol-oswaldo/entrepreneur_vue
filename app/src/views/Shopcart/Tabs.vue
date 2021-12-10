@@ -1,78 +1,109 @@
+<script>  
+  import TabList from "./TabList.vue";
+  import TabCart from "./TabCart.vue";
+  import TabOther from "./TabOther.vue";
+  
+  export default {
+    components: {
+      'tab-list': TabList,
+      'tab-cart': TabCart,
+      'tab-other': TabOther
+    }
+  };
+</script>
+
+<script setup>
+  import { ref, computed } from "vue";
+  
+  const currentTab = ref("List");
+  const tabs = ref(["List", "Cart", "Other"]);    
+  const currentTabComponent = computed(
+    () => "tab-" + currentTab.value.toLowerCase()
+  );  
+</script>
+
 <template>
   <div
-    class="relative flex items-top justify-center min-h-screen sm:items-center sm:pt-0 bg-gray-100"
+    class="tabsSection"
   >
-    <div id="dynamic-component-demo" class="mt-10 pl-0">
-      <div class="">
+    <div id="dynamic-component-demo" class="m-5 w-full">
+
+      <div class="mx-10">
         <button
           v-for="tab in tabs"
           v-bind:key="tab"
           v-bind:class="['tab-button', { active: currentTab === tab }]"
           v-on:click="currentTab = tab"
-          class="w-40"
+          class=""
         >
-          {{ tab }}
-        </button>
+	  {{ tab }}
+	</button>
       </div>
-      <component v-bind:is="currentTabComponent" class="tab bg-white">
-      </component>
+
+      <transition name="fade" mode="out-in">
+        <keep-alive>
+          <component v-bind:is="currentTabComponent" class="bg-white"></component>
+        </keep-alive>
+      </transition>
+
     </div>
   </div>
 </template>
 
-<script>
-import TabList from "./TabList.vue";
-import TabCart from "./TabCart.vue";
-
-export default {
-  components: {
-    TabList,
-    TabCart,
-  },
-  data() {
-    return {
-      currentTab: "List",
-      tabs: ["List", "Cart"],
-    };
-  },
-  computed: {
-    currentTabComponent() {
-      return "tab-" + this.currentTab.toLowerCase();
-    },
-  },
-};
-</script>
-
 <style>
-.demo {
-  font-family: sans-serif;
-  border: 1px solid #eee;
-  border-radius: 2px;
-  padding: 20px 30px;
-  margin-top: 1em;
-  margin-bottom: 40px;
-  user-select: none;
-  overflow-x: auto;
-}
+  .fade-enter-active,
+  .fade-leave-active{
+    transition: opacity 0.3s;
+  }
 
-.tab-button {
-  padding: 6px 10px;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  background: #f0f0f0;
-  margin-bottom: -1px;
-  margin-right: -1px;
-}
-.tab-button:hover {
-  background: #e0e0e0;
-}
-.tab-button.active {
-  background: #e0e0e0;
-}
-.demo-tab {
-  border: 1px solid #ccc;
-  padding: 10px;
-}
+  .fade-enter-from,
+  .fade-leave-to{
+    opacity:0;
+  }
+
+  h2 { @apply m-3 text-xl; }
+
+  .tabsSection { 
+    @apply 
+      relative
+      flex
+      justify-center
+      max-w-full
+      max-h-full
+      bg-gray-100;
+  }
+
+  .tab-button {
+    @apply
+      w-full
+      py-2
+      px-3
+      border
+      border-solid
+      border-gray-300
+      border-b-0
+      rounded-t-sm
+      bg-gray-100
+      cursor-pointer
+      sm:w-40;    
+  }
+
+  .tab-button:hover { @apply bg-gray-300; }
+
+  .tab-button.active {
+    @apply
+      bg-gray-400
+      text-gray-100
+      border-gray-500;
+  }
+
+  .demo-tab {
+    @apply
+      p-1
+      border
+      border-solid
+      border-gray-300;
+  }
+
 </style>
+

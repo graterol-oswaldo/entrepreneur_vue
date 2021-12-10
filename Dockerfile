@@ -20,7 +20,7 @@ ARG uid=1000
                  
 WORKDIR /app
 
-RUN npm install -g npm@7.24.2
+RUN npm install -g npm@8.2.0
 
 #RUN npm run build 
 
