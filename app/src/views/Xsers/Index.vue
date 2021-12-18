@@ -12,12 +12,10 @@
       <div class="mb-6 flex justify-between items-center">
         <div class="flex items-center">
           <div class="flex w-full bg-white shadow rounded">
-            <!-- Note: can't use v-model here, because search is a prop. -->
-            <!-- Also, setSearch is debounced 300ms -->
             <input
               class=""
               type="text"
-              :value="search"
+              v-model="data.search"
               @input="setSearch"
               placeholder="Filtrar…"
             />
@@ -41,7 +39,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="user in rows.data" :key="user.id" class="">
+            <tr v-for="user in data.rows" :key="user.id" class="">
               <td class="">
 
 
@@ -84,19 +82,20 @@
                 </div>
               </td>
             </tr>
-            <tr v-if="rows.length === 0">
+            <tr v-if="data.rows.length === 0">
               <td class="" colspan="4">Usuarios no encontrados.</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <Pagination v-if="links" :links="links" />
+      <Pagination v-if="data.links" :links="data.links" />
     </div>
   </div>
 </template>
 
 <script>
-import { onMounted, ref } from "vue";
+import { onMounted//, ref
+  , reactive } from "vue";
 import { onBeforeRouteUpdate, useRouter, useRoute } from 'vue-router' 
 import Pagination from "@/components/Pagination";
 import { useSearch } from "@/hooks/useTableGrid";
@@ -107,18 +106,27 @@ export default {
   components: {
     Pagination,
   },
-  props: ["errors", "search", "sort", "direction"],  
+  //  props: ["errors"],  
+  props: [],  
   setup(props) {
-  const router = useRouter();
-  const route = useRoute();
+    const router = useRouter();
+    const route = useRoute();
+    const data = reactive({
+      rows: [],
+      links: [],
+      search: "",
+      sort: "",
+      direction: ""
+    });
 
-    const rows = ref([]);
-    const links = ref([]);
-    const getUsers = (q="page=1") => {
-      return XserService.getXsers(q)
+    const getUsers = (routeQuery) => {
+      return XserService.getXsers(routeQuery)
         .then((response) => {
-          rows.value = response.data;
-          links.value = response.data.links;
+          data.rows = response.data.rows.data;
+          data.links = response.data.rows.links;
+          data.search = response.data.search;
+          data.sort = response.data.sort;
+          data.direction = response.data.direction;
         })
         .catch((error) => {
           console.log(error);
@@ -126,43 +134,32 @@ export default {
     };
     
     onBeforeRouteUpdate(async (to, from) => {      
-
       if (to.query !== from.query) {        
-
         await getUsers(new URLSearchParams(to.query).toString());        
-
-
-        //await getUsers("page="+to.query.page);        
       }
     });
 
     onMounted(() => {
       getUsers(new URLSearchParams(route.query).toString());    
     });
+
     const load = (newParams) => {
-      // mix defaults and new parameters
       const params = {
-        search: props.search || "",
-        sort: props.sort || "",
-        direction: props.direction || "",
+        search: data.search || "",
+        sort: data.sort || "",
+        direction: data.direction || "",
         ...newParams,
       };
-      // convert obj into url
-//      const urlQuery = new URLSearchParams(params).toString();
-        let routeQuery = route.query;
-        const urlQuery = { ...routeQuery, ...params };
-        //const xurlQuery = new URLSearchParams(urlQuery).toString();
-        console.log(urlQuery);
 
-        router.push({path:'/xsers', query: urlQuery});
-
-//console.log(xurlQuery);
-//      getUsers(xurlQuery);
-
-//      Inertia.get(`/users?${urlQuery}`, [], {
-//        preserveState: true,
-//      });
+      router.push({
+        path:'/xsers',
+        query: {
+          ...route.query,
+          ...params
+        }
+      });
     };
+
     const deleteRow = (rowId) => {
       if (confirm("¿Estás seguro de que quieres eliminar?")) {
         // Inertia.delete(route("users.destroy", rowId));
@@ -170,12 +167,10 @@ export default {
     };
 
     return {
-      rows,
-      links,
+      data,
       deleteRow,
-  //    RouterLink,
-      ...useSearch(props, load),
+      ...useSearch(data, load),
     };
-  },
+  }
 };
 </script>
