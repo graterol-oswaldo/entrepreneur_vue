@@ -97,7 +97,7 @@
 
 <script>
 import { onMounted, ref } from "vue";
-import { onBeforeRouteUpdate } from 'vue-router' 
+import { onBeforeRouteUpdate, useRouter, useRoute } from 'vue-router' 
 import Pagination from "@/components/Pagination";
 import { useSearch } from "@/hooks/useTableGrid";
 import XserService from "@/services/XserService";
@@ -109,7 +109,9 @@ export default {
   },
   props: ["errors", "search", "sort", "direction"],  
   setup(props) {
-  
+  const router = useRouter();
+  const route = useRoute();
+
     const rows = ref([]);
     const links = ref([]);
     const getUsers = (q="page=1") => {
@@ -117,7 +119,6 @@ export default {
         .then((response) => {
           rows.value = response.data;
           links.value = response.data.links;
-          //console.log(response.data.links);
         })
         .catch((error) => {
           console.log(error);
@@ -125,13 +126,18 @@ export default {
     };
     
     onBeforeRouteUpdate(async (to, from) => {      
+
       if (to.query !== from.query) {        
-        await getUsers("page="+to.query.page);        
+
+        await getUsers(new URLSearchParams(to.query).toString());        
+
+
+        //await getUsers("page="+to.query.page);        
       }
     });
 
     onMounted(() => {
-      getUsers();    
+      getUsers(new URLSearchParams(route.query).toString());    
     });
     const load = (newParams) => {
       // mix defaults and new parameters
@@ -142,9 +148,16 @@ export default {
         ...newParams,
       };
       // convert obj into url
-      const urlQuery = new URLSearchParams(params).toString();
+//      const urlQuery = new URLSearchParams(params).toString();
+        let routeQuery = route.query;
+        const urlQuery = { ...routeQuery, ...params };
+        //const xurlQuery = new URLSearchParams(urlQuery).toString();
+        console.log(urlQuery);
 
-        alert("getUsers();");
+        router.push({path:'/xsers', query: urlQuery});
+
+//console.log(xurlQuery);
+//      getUsers(xurlQuery);
 
 //      Inertia.get(`/users?${urlQuery}`, [], {
 //        preserveState: true,
@@ -152,7 +165,7 @@ export default {
     };
     const deleteRow = (rowId) => {
       if (confirm("¿Estás seguro de que quieres eliminar?")) {
-//        Inertia.delete(route("users.destroy", rowId));
+        // Inertia.delete(route("users.destroy", rowId));
       }
     };
 
